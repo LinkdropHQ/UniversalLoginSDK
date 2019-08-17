@@ -1,12 +1,12 @@
-import {ContractFactory, Wallet, utils} from 'ethers';
+import { ContractFactory, Wallet, utils } from 'ethers';
 import ProxyContract from '@universal-login/contracts/build/Proxy.json';
 import ENSService from './ensService';
-import {EventEmitter} from 'fbemitter';
-import {Abi, defaultDeployOptions, ensureNotNull, ensure, RequiredBalanceChecker, computeContractAddress, DeployArgs, getInitializeSigner, DEPLOY_GAS_LIMIT} from '@universal-login/commons';
-import {InvalidENSDomain, NotEnoughBalance, EnsNameTaken, InvalidSignature} from '../../core/utils/errors';
-import {encodeInitializeWithENSData, encodeInitializeWithRefundData} from '@universal-login/contracts';
-import {Config} from '../../config/relayer';
-import {WalletDeployer} from '../ethereum/WalletDeployer';
+import { EventEmitter } from 'fbemitter';
+import { Abi, defaultDeployOptions, ensureNotNull, ensure, RequiredBalanceChecker, computeContractAddress, DeployArgs, getInitializeSigner, DEPLOY_GAS_LIMIT } from '@universal-login/commons';
+import { InvalidENSDomain, NotEnoughBalance, EnsNameTaken, InvalidSignature } from '../../core/utils/errors';
+import { encodeInitializeWithENSData, encodeInitializeWithRefundData } from '@universal-login/contracts';
+import { Config } from '../../config/relayer';
+import { WalletDeployer } from '../ethereum/WalletDeployer';
 
 class WalletService {
   private bytecode: string;
@@ -36,16 +36,20 @@ class WalletService {
     throw new InvalidENSDomain(ensName);
   }
 
-  async deploy({publicKey, ensName, gasPrice, signature}: DeployArgs) {
+  async deploy({ publicKey, ensName, gasPrice, signature }: DeployArgs) {
     ensure(!await this.ensService.resolveName(ensName), EnsNameTaken, ensName);
     const ensArgs = this.ensService.argsFor(ensName);
+    console.log({ ensArgs })
     ensureNotNull(ensArgs, InvalidENSDomain, ensName);
     const contractAddress = computeContractAddress(this.config.factoryAddress, publicKey, await this.walletDeployer.getInitCode());
+    console.log({ contractAddress })
     ensure(!!await this.requiredBalanceChecker.findTokenWithRequiredBalance(this.config.supportedTokens, contractAddress), NotEnoughBalance);
     const args = [publicKey, ...ensArgs as string[], gasPrice];
+    console.log({ args })
     const initWithENS = encodeInitializeWithRefundData(args);
+    console.log({ initWithENS })
     ensure(getInitializeSigner(initWithENS, signature) === publicKey, InvalidSignature);
-    return this.walletDeployer.deploy({publicKey, signature, intializeData: initWithENS}, {gasLimit: DEPLOY_GAS_LIMIT, gasPrice: utils.bigNumberify(gasPrice)});
+    return this.walletDeployer.deploy({ publicKey, signature, intializeData: initWithENS }, { gasLimit: DEPLOY_GAS_LIMIT, gasPrice: utils.bigNumberify(gasPrice) });
   }
 }
 

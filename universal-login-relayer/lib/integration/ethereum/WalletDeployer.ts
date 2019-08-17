@@ -1,5 +1,5 @@
-import {Contract, Wallet} from 'ethers';
-import {TransactionOverrides} from '@universal-login/commons';
+import { Contract, Wallet } from 'ethers';
+import { TransactionOverrides } from '@universal-login/commons';
 import ProxyCounterfactualFactory from '@universal-login/contracts/build/ProxyCounterfactualFactory.json';
 
 interface DeployFactoryArgs {
@@ -16,6 +16,7 @@ export class WalletDeployer {
   }
 
   deploy(deployFactoryArgs: DeployFactoryArgs, overrideOptions: TransactionOverrides) {
+    console.log({ deployFactoryArgs, overrideOptions })
     return this.factoryContract.createContract(deployFactoryArgs.publicKey, deployFactoryArgs.intializeData, deployFactoryArgs.signature, overrideOptions);
   }
 

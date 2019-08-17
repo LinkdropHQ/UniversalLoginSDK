@@ -5,6 +5,7 @@ import {InvalidProxy} from '../../utils/errors';
 
 export class MessageValidator {
   constructor(private wallet: Wallet, private contractWhiteList: ContractWhiteList) {
+    console.log('MessageValidator inited with whitelist: ', contractWhiteList)
   }
 
   async validate(signedMessage: SignedMessage, transactionReq: providers.TransactionRequest) : Promise<void> {
@@ -16,6 +17,7 @@ export class MessageValidator {
   private async ensureCorrectProxy(from: string) {
     const proxyByteCode = await this.wallet.provider.getCode(from);
     const proxyContractHash = utils.keccak256(proxyByteCode);
+    console.log("ensureCorrectProxy whitelist: ", this.contractWhiteList.proxy)
     ensure(
       this.contractWhiteList.proxy.includes(proxyContractHash),
       InvalidProxy,

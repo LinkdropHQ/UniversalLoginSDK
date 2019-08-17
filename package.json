@@ -25,7 +25,8 @@
     "ci": "yarn lint && yarn test",
     "clean": "yarn wsrun clean",
     "bump:version": "yarn lerna version --no-push",
-    "publish:packages": "yarn lerna publish from-package"
+    "publish:packages": "yarn lerna publish from-package",
+    "server": "cd universal-login-relayer && pm2 start --name ul-relayer npm -- run relayer:start"
   },
   "engines": {
     "node": "10.15",
